@@ -31,9 +31,9 @@ const Login = () => {
         newErrors.password = validation.error;
       }
       setErrors(newErrors);
-      logSecurityEvent('FORM_VALIDATION_FAILED', { 
-        email, 
-        error: validation.error 
+      logSecurityEvent('FORM_VALIDATION_FAILED', {
+        email,
+        error: validation.error
       });
       return false;
     }
@@ -43,7 +43,7 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -66,7 +66,7 @@ const Login = () => {
   const handleInputChange = (field: 'email' | 'password', value: string) => {
     // Basic input sanitization
     const sanitizedValue = value.replace(/[<>'"&]/g, '');
-    
+
     if (field === 'email') {
       setEmail(sanitizedValue);
       if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
@@ -83,7 +83,7 @@ const Login = () => {
           <div className="flex items-center justify-center mb-6">
             <Shield className="h-8 w-8 text-primary mr-2" />
             <h1 className="text-xl md:text-2xl font-bold text-primary">
-              PharmaCare Pro
+              Imaan Departmental Store
             </h1>
           </div>
 
@@ -108,7 +108,7 @@ const Login = () => {
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
-            
+
             <div>
               <label htmlFor="password" className="block text-sm font-medium mb-1">
                 Password
@@ -143,10 +143,10 @@ const Login = () => {
               </div>
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
             </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full" 
+
+            <Button
+              type="submit"
+              className="w-full"
               disabled={isLoggingIn}
             >
               {isLoggingIn ? (

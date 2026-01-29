@@ -37,9 +37,10 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
             setError(null);
 
             console.log("Fetching inventory from Supabase...");
+            // Use correct table name product_batches as per schema.sql
             const { data, error: fetchError } = await supabase
                 .from('inventory')
-                .select('*, batches:inventory_batches(*)')
+                .select('*, batches:product_batches(*)')
                 .order('name', { ascending: true });
 
             if (fetchError) {

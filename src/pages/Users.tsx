@@ -30,61 +30,26 @@ const Users = () => {
   const { canManageUsers, canEditUsers, canDeleteUsers } = usePermissions();
   const { toast } = useToast();
 
-  // Fetch users from database using secure edge function
+  // Fetch users directly from the single 'users' table
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
 
-      // Get auth users via secure edge function (only SUPER_ADMIN can access)
-      const { data: sessionData } = await supabase.auth.getSession();
-      const session = sessionData?.session;
-      console.log("[UsersPage] Fetching users, session:", session ? "Active" : "None");
-      const accessToken = sessionData?.session?.access_token;
+      console.log("[UsersPage] Querying users table...");
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
+        .select('*')
+        .order('name');
 
-      let authUsers: Array<{ id: string; email: string }> = [];
+      if (usersError) throw usersError;
 
-      if (accessToken) {
-        const response = await supabase.functions.invoke('list-users', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (response.error) {
-          console.warn('Could not fetch auth users (may not have SUPER_ADMIN role):', response.error);
-        } else {
-          authUsers = response.data?.users || [];
-        }
-      }
-
-      // Fetch profiles (now restricted by RLS - users see only their own unless SUPER_ADMIN)
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          user_id,
-          name,
-          username
-        `);
-
-      if (profilesError) throw profilesError;
-
-      // Fetch roles (now restricted by RLS - users see only their own unless SUPER_ADMIN)
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
-
-      if (rolesError) throw rolesError;
-
-      const rolesMap = new Map((rolesData || []).map(r => [r.user_id, r.role]));
-      const authUsersMap = new Map(authUsers.map(u => [u.id, u.email]));
-
-      const usersList: User[] = (profiles || []).map((profile: any) => ({
-        id: profile.user_id,
-        email: authUsersMap.get(profile.user_id) || '',
-        name: profile.name,
-        username: profile.username || undefined,
-        role: rolesMap.get(profile.user_id) || 'CASHIER',
+      // Map the single table data to the User interface
+      const usersList: User[] = (usersData || []).map((u: any) => ({
+        id: u.id,
+        email: u.email, // Email is now directly in users table
+        name: u.name,
+        username: u.username || undefined,
+        role: u.role || 'CASHIER',
       }));
 
       setUsers(usersList);
@@ -103,7 +68,7 @@ const Users = () => {
   useEffect(() => {
     fetchUsers();
 
-    // Set up real-time subscription
+    // Set up real-time subscription on 'users' table
     const channel = supabase
       .channel('users-changes')
       .on(
@@ -111,7 +76,7 @@ const Users = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'profiles'
+          table: 'users'
         },
         () => {
           fetchUsers();

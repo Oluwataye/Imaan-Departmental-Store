@@ -31,17 +31,31 @@ const createSafeClient = () => {
     });
   } catch (error) {
     console.error("Failed to initialize Supabase client:", error);
-    // Return a dummy client proxy that logs errors when used
-    // This satisfies the type checker but prevents runtime "Module Evaluation" crashes
-    return new Proxy({} as any, {
-      get: (target, prop) => {
-        if (prop === 'then') return undefined; // Promise safety
-        return () => {
-          console.error(`Attempted to call Supabase.${String(prop)} but client failed to initialize.`);
-          return { data: null, error: { message: "Supabase client not initialized. Check console for missing Environment Variables." } };
-        };
-      }
-    });
+
+    // Return a structured dummy client that satisfies the AuthContext requirements
+    // This prevents the "K.auth.onAuthStateChange is not a function" crash
+    const mockClient = {
+      auth: {
+        getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+        getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+        signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: { message: "Supabase client not initialized. Missing environment variables." } }),
+        signOut: () => Promise.resolve({ error: null }),
+      },
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            limit: () => Promise.resolve({ data: null, error: { message: "Database not connected" } }),
+            single: () => Promise.resolve({ data: null, error: { message: "Database not connected" } })
+          })
+        }),
+        insert: () => Promise.resolve({ data: null, error: { message: "Database not connected" } }),
+        update: () => Promise.resolve({ data: null, error: { message: "Database not connected" } }),
+        delete: () => Promise.resolve({ data: null, error: { message: "Database not connected" } }),
+      })
+    };
+
+    return mockClient as any;
   }
 };
 

@@ -52,7 +52,13 @@ const createSafeClient = () => {
         insert: () => Promise.resolve({ data: null, error: { message: "Database not connected" } }),
         update: () => Promise.resolve({ data: null, error: { message: "Database not connected" } }),
         delete: () => Promise.resolve({ data: null, error: { message: "Database not connected" } }),
-      })
+      }),
+      channel: () => ({
+        on: () => ({ subscribe: () => { } }),
+        subscribe: () => { },
+        unsubscribe: () => { }
+      }),
+      removeChannel: () => { }
     };
 
     return mockClient as any;

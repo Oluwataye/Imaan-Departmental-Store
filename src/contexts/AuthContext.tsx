@@ -39,11 +39,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       // Use specific columns and limit to stabilize the 406-prone single fetch
-      console.log('[AuthProvider] Pulse: Querying profiles table...');
+      console.log('[AuthProvider] Pulse: Querying users table...');
       const profileQuery = supabase
-        .from('profiles')
-        .select('name, username')
-        .eq('user_id', userId)
+        .from('users')
+        .select('name, username, role')
+        .eq('id', userId)
         .limit(1);
 
       const { data: profiles, error: profileError } = await fetchWithTimeout(profileQuery) as any;
@@ -59,27 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null;
       }
       console.log('[AuthProvider] Pulse: Profile found:', profile.name);
-
-      console.log('[AuthProvider] Pulse: Querying user_roles table...');
-      const rolesQuery = supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .limit(1);
-
-      const { data: roles, error: rolesError } = await fetchWithTimeout(rolesQuery) as any;
-
-      if (rolesError) {
-        console.error('[AuthProvider] Pulse: Roles query error:', rolesError);
-        throw rolesError;
-      }
-
-      const roleData = (roles as any[])?.[0];
-      if (!roleData) {
-        console.warn('[AuthProvider] Pulse: No role found for user:', userId);
-        return null;
-      }
-      console.log('[AuthProvider] Pulse: Role found:', roleData.role);
+      console.log('[AuthProvider] Pulse: Role found:', profile.role);
 
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -88,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: user?.email || '',
         name: profile.name,
         username: profile.username || undefined,
-        role: roleData.role as UserRole,
+        role: profile.role as UserRole,
       };
     } catch (error) {
       // Expand error object logging for better diagnostics

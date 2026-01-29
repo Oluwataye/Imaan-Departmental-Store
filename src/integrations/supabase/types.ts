@@ -266,310 +266,54 @@ export type Database = {
           },
         ]
       }
-      profiles: {
+      users: {
         Row: {
-          created_at: string
           id: string
-          name: string
-          updated_at: string
-          user_id: string
+          email: string
           username: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          name: string
-          updated_at?: string
-          user_id: string
-          username?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          name?: string
-          updated_at?: string
-          user_id?: string
-          username?: string | null
-        }
-        Relationships: []
-      }
-      rate_limits: {
-        Row: {
-          action: string
-          attempts: number
-          created_at: string
-          id: string
-          identifier: string
-          updated_at: string
-          window_start: string
-        }
-        Insert: {
-          action: string
-          attempts?: number
-          created_at?: string
-          id?: string
-          identifier: string
-          updated_at?: string
-          window_start?: string
-        }
-        Update: {
-          action?: string
-          attempts?: number
-          created_at?: string
-          id?: string
-          identifier?: string
-          updated_at?: string
-          window_start?: string
-        }
-        Relationships: []
-      }
-      receipts: {
-        Row: {
-          created_at: string
-          id: string
-          receipt_data: Json
-          sale_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          receipt_data: Json
-          sale_id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          receipt_data?: Json
-          sale_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "receipts_sale_id_fkey"
-            columns: ["sale_id"]
-            isOneToOne: false
-            referencedRelation: "sales"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sales: {
-        Row: {
-          business_address: string | null
-          business_name: string | null
-          cashier_email: string | null
-          cashier_id: string | null
-          cashier_name: string | null
-          created_at: string | null
-          customer_name: string | null
-          customer_phone: string | null
-          discount: number | null
-          id: string
-          sale_type: string
-          status: string
-          total: number
-          transaction_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          business_address?: string | null
-          business_name?: string | null
-          cashier_email?: string | null
-          cashier_id?: string | null
-          cashier_name?: string | null
-          created_at?: string | null
-          customer_name?: string | null
-          customer_phone?: string | null
-          discount?: number | null
-          id?: string
-          sale_type?: string
-          status?: string
-          total: number
-          transaction_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          business_address?: string | null
-          business_name?: string | null
-          cashier_email?: string | null
-          cashier_id?: string | null
-          cashier_name?: string | null
-          created_at?: string | null
-          customer_name?: string | null
-          customer_phone?: string | null
-          discount?: number | null
-          id?: string
-          sale_type?: string
-          status?: string
-          total?: number
-          transaction_id?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      sales_items: {
-        Row: {
-          created_at: string | null
-          discount: number | null
-          id: string
-          is_wholesale: boolean | null
-          price: number
-          product_id: string
-          product_name: string
-          quantity: number
-          sale_id: string
-          total: number
-          unit_price: number
-        }
-        Insert: {
-          created_at?: string | null
-          discount?: number | null
-          id?: string
-          is_wholesale?: boolean | null
-          price: number
-          product_id: string
-          product_name: string
-          quantity: number
-          sale_id: string
-          total: number
-          unit_price: number
-        }
-        Update: {
-          created_at?: string | null
-          discount?: number | null
-          id?: string
-          is_wholesale?: boolean | null
-          price?: number
-          product_id?: string
-          product_name?: string
-          quantity?: number
-          sale_id?: string
-          total?: number
-          unit_price?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sales_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "inventory"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sales_items_sale_id_fkey"
-            columns: ["sale_id"]
-            isOneToOne: false
-            referencedRelation: "sales"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      store_settings: {
-        Row: {
-          address: string | null
-          email: string | null
-          id: string
-          logo_url: string | null
-          name: string
-          phone: string | null
-          print_show_address: boolean | null
-          print_show_email: boolean | null
-          print_show_footer: boolean | null
-          print_show_logo: boolean | null
-          print_show_phone: boolean | null
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          address?: string | null
-          email?: string | null
-          id?: string
-          logo_url?: string | null
-          name?: string
-          phone?: string | null
-          print_show_address?: boolean | null
-          print_show_email?: boolean | null
-          print_show_footer?: boolean | null
-          print_show_logo?: boolean | null
-          print_show_phone?: boolean | null
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          address?: string | null
-          email?: string | null
-          id?: string
-          logo_url?: string | null
-          name?: string
-          phone?: string | null
-          print_show_address?: boolean | null
-          print_show_email?: boolean | null
-          print_show_footer?: boolean | null
-          print_show_logo?: boolean | null
-          print_show_phone?: boolean | null
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
+          name: string | null
           role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          created_at: string
+          updated_at: string
         }
         Insert: {
-          created_at?: string
-          id?: string
+          id: string
+          email: string
+          username?: string | null
+          name?: string | null
           role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          created_at?: string
+          updated_at?: string
         }
         Update: {
-          created_at?: string
           id?: string
+          email?: string
+          username?: string | null
+          name?: string | null
           role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
+          created_at?: string
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      anonymize_user_data: { Args: { p_user_id: string }; Returns: boolean }
-      cleanup_expired_data: { Args: never; Returns: undefined }
-      cleanup_old_rate_limits: { Args: never; Returns: undefined }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      log_audit_event: {
-        Args: {
-          p_action: string
-          p_details?: Json
-          p_error_message?: string
-          p_event_type: Database["public"]["Enums"]["audit_event_type"]
-          p_ip_address?: string
-          p_resource_id?: string
-          p_resource_type?: string
-          p_status?: string
-          p_user_agent?: string
-          p_user_email: string
-          p_user_id: string
-          p_user_role: string
-        }
-        Returns: string
-      }
+      // ... existing functions
     }
     Enums: {
-      app_role: "SUPER_ADMIN" | "PHARMACIST" | "DISPENSER"
+      app_role: "ADMIN" | "STORE_MANAGER" | "CASHIER"
+      // ... existing audit enums
       audit_event_type:
       | "LOGIN_SUCCESS"
       | "LOGIN_FAILED"

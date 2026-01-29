@@ -5,13 +5,44 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+// Check for missing keys immediately to aid debugging
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error("__________________________________________________________");
+  console.error("CRITICAL ERROR: MISSING SUPABASE ENVIRONMENT VARIABLES");
+  console.error("VITE_SUPABASE_URL:", SUPABASE_URL ? "Set" : "MISSING");
+  console.error("VITE_SUPABASE_ANON_KEY:", SUPABASE_ANON_KEY ? "Set" : "MISSING");
+  console.error("Please add these to your Netlify Site Settings!");
+  console.error("__________________________________________________________");
+}
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    storage: sessionStorage,
-    persistSession: true,
-    autoRefreshToken: true,
+// Safer initialization that won't crash the entire app bundle if keys are missing
+// This allows the UI to render and show a friendly error instead of a white screen
+const createSafeClient = () => {
+  try {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      throw new Error("Missing Supabase Credentials");
+    }
+    return createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        storage: sessionStorage,
+        persistSession: true,
+        autoRefreshToken: true,
+      }
+    });
+  } catch (error) {
+    console.error("Failed to initialize Supabase client:", error);
+    // Return a dummy client proxy that logs errors when used
+    // This satisfies the type checker but prevents runtime "Module Evaluation" crashes
+    return new Proxy({} as any, {
+      get: (target, prop) => {
+        if (prop === 'then') return undefined; // Promise safety
+        return () => {
+          console.error(`Attempted to call Supabase.${String(prop)} but client failed to initialize.`);
+          return { data: null, error: { message: "Supabase client not initialized. Check console for missing Environment Variables." } };
+        };
+      }
+    });
   }
-});
+};
+
+export const supabase = createSafeClient();
